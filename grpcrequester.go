@@ -21,7 +21,7 @@ type Requester struct {
 }
 
 // NewRequester ...
-func NewRequester(addr string, service string, method string, timeoutMs uint, poolsize int) *Requester {
+func NewRequester(addr string, service string, method string, timeoutMs uint, initialCap int, maxCap int, maxIdle int) *Requester {
 	//factory 创建连接的方法
 	factory := func() (interface{}, error) { return grpc.Dial(addr, grpc.WithInsecure()) }
 
@@ -30,9 +30,9 @@ func NewRequester(addr string, service string, method string, timeoutMs uint, po
 
 	//创建一个连接池： 初始化5,最大连接200,最大空闲10
 	poolConfig := &pool.Config{
-		InitialCap: 5,
-		MaxCap:     poolsize,
-		MaxIdle:    10,
+		InitialCap: initialCap,
+		MaxCap:     maxCap,
+		MaxIdle:    maxIdle,
 		Factory:    factory,
 		Close:      closef,
 		//连接最大空闲时间，超过该时间的连接 将会关闭，可避免空闲时连接EOF，自动失效的问题
